@@ -3,11 +3,11 @@
 # 3: Remove cells
 # 4: Player mechanics (insert number, remove number)
 # 5: Check if valid when board is complete
-
+import copy
 import random
 
 
-class Board:
+class Sudoku:
     def __init__(self):
         self._board = [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
                        ['-------------------------------------------------------------'],
@@ -25,9 +25,15 @@ class Board:
         self._solution = self.create_solution()
         self._puzzle = self.create_puzzle()
 
-    def display(self):
+    def display(self, item):
         for i in range(13):
-            print(self._board[i])
+            print(item[i])
+
+    def show_board(self):
+        self.display(self._board)
+
+    def show_puzzle(self):  # for testing only
+        return self.display(self._puzzle)
 
     def create_solution(self):
         """
@@ -62,13 +68,12 @@ class Board:
         """
         Adds some numbers from solution to board.
         """
-
         indices = [2, 3, 4, 6, 7, 8, 10, 11, 12]
         for i in range(18):  # 18 arbitrary; for testing purposes; will adjust by difficulty later
             row = random.choice(indices)
             col = random.choice(indices)
             self._board[row][col] = self._solution[row][col]
-        return self._board
+        return copy.deepcopy(self._board)
 
     def reset_puzzle(self):
         self._board = self._puzzle
@@ -103,7 +108,31 @@ class Board:
         return True
         # etc.
 
+    def make_move(self, position, value):
+        """
+        Adds value to the position on the board and displays board.
+        Overwrites previous moves, but not numbers present at start of puzzle.
+        :param position: string
+        :param value: string
+        :return: None
+        """
+        position_list = list(position)
+        row = position_list[1]
+        i = 0
+        while type(row) is str:
+            if self._board[i][0] == row:
+                row = i
+            i += 1
+        col = self._board[0].index(position_list[0])
+
+        # Only write value on positions that were blanks at the beginning of the puzzle
+        if self._puzzle[row][col] == '_':
+            self._board[row][col] = value
+
 
 # Test area
-b = Board()
-print(b.display())
+b = Sudoku()
+print(b.show_board())
+print(b.make_move('b1', '2'))
+print(b.show_board())
+print(b.show_puzzle())  # makes sure original puzzle not changed
