@@ -1,6 +1,6 @@
 # 1: Create board display DONE
 # 2: Randomly generate solution Later
-# 3: Remove cells
+# 3: Remove cells DONE
 # 4: Player mechanics (insert number, remove number)
 # 5: Check if valid when board is complete
 import copy
@@ -24,6 +24,26 @@ class Sudoku:
                        ['9', '|', '_', '_', '_', '|', '_', '_', '_', '|', '_', '_', '_']]
         self._solution = self.create_solution()
         self._puzzle = self.create_puzzle()
+        self._num_empty_cells = 63  # since each puzzle has 18 cells filled initially, 63 is left
+
+    def get_solution(self):
+        return self._solution
+
+    def set_board(self):
+        """For testing only"""
+        self._board = [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
+                ['-------------------------------------------------------------'],
+                ['1', '|', '1', '2', '3', '|', '4', '5', '6', '|', '7', '8', '9'],
+                ['2', '|', '4', '5', '6', '|', '7', '8', '9', '|', '1', '2', '3'],
+                ['3', '|', '7', '8', '9', '|', '1', '2', '3', '|', '4', '5', '6'],
+                ['-------------------------------------------------------------'],
+                ['4', '|', '2', '6', '1', '|', '5', '3', '4', '|', '9', '7', '8'],
+                ['5', '|', '3', '7', '4', '|', '2', '9', '8', '|', '6', '1', '5'],
+                ['6', '|', '5', '9', '8', '|', '6', '1', '7', '|', '2', '3', '4'],
+                ['-------------------------------------------------------------'],
+                ['7', '|', '6', '1', '2', '|', '8', '4', '5', '|', '3', '9', '7'],
+                ['8', '|', '8', '3', '5', '|', '9', '7', '1', '|', '4', '6', '2'],
+                ['9', '|', '9', '4', '7', '|', '3', '6', '2', '|', '8', '5', '1']]
 
     def display(self, item):
         for i in range(13):
@@ -78,35 +98,12 @@ class Sudoku:
     def reset_puzzle(self):
         self._board = self._puzzle
 
-    def check_quadrant(self, val, row, col):
-        """
-        Returns True if quadrant does not contain the input value.
-        Otherwise, returns False.
-        """
-        b = self._board
-        # Check first quadrant
-        if 2 <= row <= 4:
-
-            # Check first quadrant
-            if 2 <= col <= 4:
-                for i in range(2, 5):
-                    for j in range(2, 5):
-                        if b[i][j] == val:
-                            return False
-            # Check second quadrant
-            if 6 <= col <= 8:
-                for i in range(2, 5):
-                    for j in range(6, 9):
-                        if b[i][j] == val:
-                            return False
-            # Check third quadrant
-            if 9 <= col <= 12:
-                for i in range(2, 5):
-                    for j in range(9, 13):
-                        if b[i][j] == val:
-                            return False
-        return True
-        # etc.
+    def check_solution(self):
+        if self._board == self._solution:
+            print('Congratulations! You won!')
+        else:
+            print('Sorry, please check your solution and try again.')
+        return self._board
 
     def make_move(self, position, value):
         """
@@ -128,11 +125,40 @@ class Sudoku:
         # Only write value on positions that were blanks at the beginning of the puzzle
         if self._puzzle[row][col] == '_':
             self._board[row][col] = value
+            self._num_empty_cells += 1
+            self.show_board()
+        else:
+            print('Error: Cannot override numbers from the start of the puzzle. Please try again.')
+
+        if self._num_empty_cells == 0:
+            self.check_solution()
+
+
+    def erase(self, position):
+        position_list = list(position)
+        row = position_list[1]
+        i = 0
+        while type(row) is str:
+            if self._board[i][0] == row:
+                row = i
+            i += 1
+        col = self._board[0].index(position_list[0])
+
+        # Only erases value on positions that were blanks at the beginning of the puzzle
+        if self._puzzle[row][col] == '_':
+            self._board[row][col] = '_'
+            self.show_board()
+            self._num_empty_cells -= 1
+        else:
+            print('Error: Cannot override numbers from the start of the puzzle. Please try again.')
+
+        if self._num_empty_cells == 0:
+            self.check_solution()
 
 
 # Test area
 b = Sudoku()
-print(b.show_board())
-print(b.make_move('b1', '2'))
-print(b.show_board())
-print(b.show_puzzle())  # makes sure original puzzle not changed
+# print(b.show_board())
+# print(b.make_move('b1', '2'))
+# print(b.show_puzzle())  # makes sure original puzzle not changed
+b.check_solution()
