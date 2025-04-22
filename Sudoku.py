@@ -59,24 +59,23 @@ class Board:
     def show_solution(self):
         return self._solution
 
-    def check_row(self, val, row_index):
+    def check_row(self, board, val, row_index):
         """
         Checks if the val is already in the specified row
         """
-        row = self._board[row_index]
+        row = board[row_index]
         for i in [2,3,4,6,7,8,10,11,12]:
             if row[i] == val:
                 return True
         return False
 
-    def check_col(self, val, col_index):
-        b = self._board
+    def check_col(self, board, val, col_index):
         for i in [2,3,4,6,7,8,10,11,12]:
-            if b[i][col_index] == val:
+            if board[i][col_index] == val:
                 return True
         return False
 
-    def check_quad(self, val, row_index, col_index):
+    def check_quad(self, board, val, row_index, col_index):
         if row_index in [2,3,4]:
             row_indices = [2,3,4]
         elif row_index in [6,7,8]:
@@ -91,10 +90,9 @@ class Board:
         else:
             col_indices = [10, 11, 12]
 
-        b = self._board
         for row in row_indices:
             for col in col_indices:
-                if b[row][col] == val:
+                if board[row][col] == val:
                     return True
         return False
 
@@ -113,13 +111,13 @@ class Board:
                 choices.remove(num)
                 row[i] = str(num)
          # Second row
-        for j in [2,3,4,6,7,8,10,11,12]:
+        for j in [3,4,6,7,8,10,11,12]:
             choices = [1, 2, 3, 4, 5, 6, 7, 8, 9]
             row = solution[j]
             for i in range(2,13):
                 if row[i] == '_':
                     num = random.choice(choices)
-                    while self.check_row(num,j) and self.check_col(num,i) and self.check_quad(num,j,i):
+                    while self.check_row(solution, num,j) and self.check_col(solution, num,i) and self.check_quad(solution, num,j,i):
                         num = random.choice(choices)
                     choices.remove(num)
                     row[i] = str(num)
@@ -180,7 +178,7 @@ class Board:
         col = self._board[0].index(position_list[0])
 
         # Only write value on positions that were blanks at the beginning of the puzzle
-        if self.check_row(value, row) is False and self.check_col(value, col) is False and self.check_quad(value,row,col) is False:
+        if self.check_row(self._board, value, row) is False and self.check_col(self._board, value, col) is False and self.check_quad(self._board, value,row,col) is False:
             if self._puzzle[row][col] == '_':
                 self._board[row][col] = value
                 self._num_empty_cells += 1
