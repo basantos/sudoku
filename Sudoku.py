@@ -1,8 +1,8 @@
 # 1: Create board display DONE
-# 2: Randomly generate solution Later
+# 2: Randomly generate solution DONE
 # 3: Remove cells DONE
-# 4: Player mechanics (insert number, remove number)
-# 5: Check if valid when board is complete
+# 4: Player mechanics (insert number, remove number) DONE
+# 5: Check if valid when board is complete DONE
 import copy
 import random
 
@@ -55,34 +55,90 @@ class Sudoku:
     def show_puzzle(self):  # for testing only
         return self.display(self._puzzle)
 
+    def show_solution(self):
+        return self._solution
+
+    def check_row(self, val, row_index):
+        """
+        Checks if the val is already in the specified row
+        """
+        row = self._board[row_index]
+        for i in [2,3,4,6,7,8,10,11,12]:
+            if row[i] == val:
+                return True
+        return False
+
+    def check_col(self, val, col_index):
+        b = self._board
+        for i in [2,3,4,6,7,8,10,11,12]:
+            if b[i][col_index] == val:
+                return True
+        return False
+
+    def check_quad(self, val, row_index, col_index):
+        if row_index in [2,3,4]:
+            row_indices = [2,3,4]
+        elif row_index in [6,7,8]:
+            row_indices = [6,7,8]
+        else:
+            row_indices = [10,11,12]
+
+        if col_index in [2, 3, 4]:
+            col_indices = [2, 3, 4]
+        elif col_index in [6, 7, 8]:
+            col_indices = [6, 7, 8]
+        else:
+            col_indices = [10, 11, 12]
+
+        b = self._board
+        for row in row_indices:
+            for col in col_indices:
+                if b[row][col] == val:
+                    return True
+        return False
+
     def create_solution(self):
         """
         Creates solution for a game board.
         """
-        # Do Later
-        # choices = [1,2,3,4,5,6,7,8,9]
-        # # First row
-        # row = self._board[2]
-        # for i in range(2,13):
-        #     if row[i] == '_':
-        #         num = random.choice(choices)
-        #         choices.remove(num)
-        #         row[i] = str(num)
+        solution = copy.deepcopy(self._board)
 
-        # for testing only
-        return [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
-                ['-------------------------------------------------------------'],
-                ['1', '|', '1', '2', '3', '|', '4', '5', '6', '|', '7', '8', '9'],
-                ['2', '|', '4', '5', '6', '|', '7', '8', '9', '|', '1', '2', '3'],
-                ['3', '|', '7', '8', '9', '|', '1', '2', '3', '|', '4', '5', '6'],
-                ['-------------------------------------------------------------'],
-                ['4', '|', '2', '6', '1', '|', '5', '3', '4', '|', '9', '7', '8'],
-                ['5', '|', '3', '7', '4', '|', '2', '9', '8', '|', '6', '1', '5'],
-                ['6', '|', '5', '9', '8', '|', '6', '1', '7', '|', '2', '3', '4'],
-                ['-------------------------------------------------------------'],
-                ['7', '|', '6', '1', '2', '|', '8', '4', '5', '|', '3', '9', '7'],
-                ['8', '|', '8', '3', '5', '|', '9', '7', '1', '|', '4', '6', '2'],
-                ['9', '|', '9', '4', '7', '|', '3', '6', '2', '|', '8', '5', '1']]
+        choices = [1,2,3,4,5,6,7,8,9]
+        # First row
+        row = solution[2]
+        for i in range(2,13):
+            if row[i] == '_':
+                num = random.choice(choices)
+                choices.remove(num)
+                row[i] = str(num)
+         # Second row
+        for j in [2,3,4,6,7,8,10,11,12]:
+            choices = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            row = solution[j]
+            for i in range(2,13):
+                if row[i] == '_':
+                    num = random.choice(choices)
+                    while self.check_row(num,j) or self.check_col(num,i) or self.check_quad(num,j,i):
+                        num = random.choice(choices)
+                    choices.remove(num)
+                    row[i] = str(num)
+        return solution
+
+
+        # # for testing only
+        # return [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
+        #         ['-------------------------------------------------------------'],
+        #         ['1', '|', '1', '2', '3', '|', '4', '5', '6', '|', '7', '8', '9'],
+        #         ['2', '|', '4', '5', '6', '|', '7', '8', '9', '|', '1', '2', '3'],
+        #         ['3', '|', '7', '8', '9', '|', '1', '2', '3', '|', '4', '5', '6'],
+        #         ['-------------------------------------------------------------'],
+        #         ['4', '|', '2', '6', '1', '|', '5', '3', '4', '|', '9', '7', '8'],
+        #         ['5', '|', '3', '7', '4', '|', '2', '9', '8', '|', '6', '1', '5'],
+        #         ['6', '|', '5', '9', '8', '|', '6', '1', '7', '|', '2', '3', '4'],
+        #         ['-------------------------------------------------------------'],
+        #         ['7', '|', '6', '1', '2', '|', '8', '4', '5', '|', '3', '9', '7'],
+        #         ['8', '|', '8', '3', '5', '|', '9', '7', '1', '|', '4', '6', '2'],
+        #         ['9', '|', '9', '4', '7', '|', '3', '6', '2', '|', '8', '5', '1']]
 
     def create_puzzle(self):
         """
@@ -158,7 +214,4 @@ class Sudoku:
 
 # Test area
 b = Sudoku()
-# print(b.show_board())
-# print(b.make_move('b1', '2'))
-# print(b.show_puzzle())  # makes sure original puzzle not changed
-b.check_solution()
+print(b.show_board())
