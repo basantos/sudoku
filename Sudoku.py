@@ -7,7 +7,7 @@ import copy
 import random
 
 
-class Sudoku:
+class Board:
     def __init__(self):
         self._board = [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
                        ['-------------------------------------------------------------'],
@@ -25,6 +25,7 @@ class Sudoku:
         self._solution = self.create_solution()
         self._puzzle = self.create_puzzle()
         self._num_empty_cells = 63  # since each puzzle has 18 cells filled initially, 63 is left
+        self._status = "In Progress"  # others: "Lost", "Won"
 
     def get_solution(self):
         return self._solution
@@ -118,7 +119,7 @@ class Sudoku:
             for i in range(2,13):
                 if row[i] == '_':
                     num = random.choice(choices)
-                    while self.check_row(num,j) or self.check_col(num,i) or self.check_quad(num,j,i):
+                    while self.check_row(num,j) and self.check_col(num,i) and self.check_quad(num,j,i):
                         num = random.choice(choices)
                     choices.remove(num)
                     row[i] = str(num)
@@ -179,12 +180,15 @@ class Sudoku:
         col = self._board[0].index(position_list[0])
 
         # Only write value on positions that were blanks at the beginning of the puzzle
-        if self._puzzle[row][col] == '_':
-            self._board[row][col] = value
-            self._num_empty_cells += 1
-            self.show_board()
+        if self.check_row(value, row) is False and self.check_col(value, col) is False and self.check_quad(value,row,col) is False:
+            if self._puzzle[row][col] == '_':
+                self._board[row][col] = value
+                self._num_empty_cells += 1
+                self.show_board()
+            else:
+                print('Error: Cannot override numbers from the start of the puzzle. Please try again.')
         else:
-            print('Error: Cannot override numbers from the start of the puzzle. Please try again.')
+            print("Invalid move. Please try again.")
 
         if self._num_empty_cells == 0:
             self.check_solution()
@@ -211,7 +215,15 @@ class Sudoku:
         if self._num_empty_cells == 0:
             self.check_solution()
 
+    def play(self):
+        while self._num_empty_cells != 0 or self._status == "In Progress":
+            val = input("Please enter number: ")
+            pos = input("Please enter position you want to place number: ")
+            self.make_move(pos, val)
+
+
 
 # Test area
-b = Sudoku()
+b = Board()
 print(b.show_board())
+b.play()
