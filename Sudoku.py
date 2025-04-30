@@ -3,11 +3,16 @@
 # 3: Remove cells DONE
 # 4: Player mechanics (insert number, remove number) DONE
 # 5: Check if valid when board is complete DONE
+# 6: Create difficulty levels
+# 7: Create option to give up and show solution
 import copy
 import random
 
 
-class Board:
+class Sudoku:
+    """
+    Creates an instance of a Sudoku game.
+    """
     def __init__(self):
         self._board = [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
                        ['-------------------------------------------------------------'],
@@ -28,6 +33,9 @@ class Board:
         self._status = "In Progress"  # others: "Lost", "Won"
 
     def get_solution(self):
+        """
+        Returns puzzle's solution
+        """
         return self._solution
 
     def set_board(self):
@@ -47,16 +55,31 @@ class Board:
                 ['9', '|', '9', '4', '7', '|', '3', '6', '2', '|', '8', '5', '1']]
 
     def display(self, item):
+        """
+        Displays each row of the board to the console.
+        :param item: array
+        """
         for i in range(13):
             print(item[i])
 
     def show_board(self):
+        """
+        Displays board to console.
+        """
         self.display(self._board)
 
     def show_puzzle(self):  # for testing only
+        """
+        Shows puzzle to console.
+        :return:
+        """
         return self.display(self._puzzle)
 
     def show_solution(self):
+        """
+        Shows solution to console.
+        :return:
+        """
         return self._solution
 
     def check_row(self, board, val, row_index):
@@ -70,12 +93,16 @@ class Board:
         return False
 
     def check_col(self, board, val, col_index):
+        """
+        Checks if val is already in the specified column
+        """
         for i in [2,3,4,6,7,8,10,11,12]:
             if board[i][col_index] == val:
                 return True
         return False
 
     def check_quad(self, board, val, row_index, col_index):
+        """Checks if val is in the specified quadrant"""
         if row_index in [2,3,4]:
             row_indices = [2,3,4]
         elif row_index in [6,7,8]:
@@ -110,7 +137,7 @@ class Board:
                 num = random.choice(choices)
                 choices.remove(num)
                 row[i] = str(num)
-         # Second row
+         # the rest
         for j in [3,4,6,7,8,10,11,12]:
             choices = [1, 2, 3, 4, 5, 6, 7, 8, 9]
             row = solution[j]
@@ -123,25 +150,9 @@ class Board:
                     row[i] = str(num)
         return solution
 
-
-        # # for testing only
-        # return [['_', '|', 'a', 'b', 'c', '|', 'd', 'e', 'f', '|', 'g', 'h', 'i'],
-        #         ['-------------------------------------------------------------'],
-        #         ['1', '|', '1', '2', '3', '|', '4', '5', '6', '|', '7', '8', '9'],
-        #         ['2', '|', '4', '5', '6', '|', '7', '8', '9', '|', '1', '2', '3'],
-        #         ['3', '|', '7', '8', '9', '|', '1', '2', '3', '|', '4', '5', '6'],
-        #         ['-------------------------------------------------------------'],
-        #         ['4', '|', '2', '6', '1', '|', '5', '3', '4', '|', '9', '7', '8'],
-        #         ['5', '|', '3', '7', '4', '|', '2', '9', '8', '|', '6', '1', '5'],
-        #         ['6', '|', '5', '9', '8', '|', '6', '1', '7', '|', '2', '3', '4'],
-        #         ['-------------------------------------------------------------'],
-        #         ['7', '|', '6', '1', '2', '|', '8', '4', '5', '|', '3', '9', '7'],
-        #         ['8', '|', '8', '3', '5', '|', '9', '7', '1', '|', '4', '6', '2'],
-        #         ['9', '|', '9', '4', '7', '|', '3', '6', '2', '|', '8', '5', '1']]
-
     def create_puzzle(self):
         """
-        Adds some numbers from solution to board.
+        Adds some numbers from solution to board, creating the puzzle.
         """
         indices = [2, 3, 4, 6, 7, 8, 10, 11, 12]
         for i in range(18):  # 18 arbitrary; for testing purposes; will adjust by difficulty later
@@ -151,10 +162,13 @@ class Board:
         return copy.deepcopy(self._board)
 
     def reset_puzzle(self):
+        """Returns board to beginning of the puzzle state without player moves."""
         self._board = self._puzzle
 
     def check_solution(self):
+        """Checks to see if the player solution is correct and ends the game."""
         if self._board == self._solution:
+            self._status = 'WON'
             print('Congratulations! You won!')
         else:
             print('Sorry, please check your solution and try again.')
@@ -220,8 +234,12 @@ class Board:
             self.make_move(pos, val)
 
 
-
 # Test area
-b = Board()
-print(b.show_board())
-b.play()
+def main():
+    b = Sudoku()
+    print(b.show_board())
+    b.play()
+
+if __name__ == '__main__':
+    main()
+
